@@ -1,53 +1,69 @@
 <script setup lang="ts">
-import HelloWorld from "./components/HelloWorld.vue";
-import TheWelcome from "./components/TheWelcome.vue";
+import {
+    onMounted,
+    onUnmounted,
+    onBeforeMount,
+    onBeforeUpdate,
+    onUpdated,
+    ref,
+    onRenderTracked,
+} from "vue";
+
+const data = ref<string | null>(null);
+const isLoading = ref<boolean>(false);
+let intervalId: number | null = null;
+const input = ref<string | null>(null);
+
+const fetchData = async () => {
+    isLoading.value = true;
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    data.value = "Dữ liệu đã được tải!";
+    isLoading.value = false;
+};
+
+onBeforeMount(() => {
+    console.log("Component sắp được mount");
+});
+
+onMounted(() => {
+    console.log("Component đã được mount");
+    fetchData();
+
+    intervalId = setInterval(() => {
+        console.log("Cập nhật mỗi giây...");
+    }, 1000);
+});
+
+onBeforeUpdate(() => {
+    console.log("Component sắp đc update");
+});
+
+onUpdated(() => {
+    console.log("component đã đc update");
+});
+
+onUnmounted(() => {
+    console.log("Component đã được unmount");
+
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+});
+
+onRenderTracked((e) => {
+    console.log('Render tracked:', e);
+});
 </script>
 
 <template>
-    <header>
-        <img
-            alt="Vue logo"
-            class="logo"
-            src="./assets/logo.svg"
-            width="125"
-            height="125"
-        />
-
-        <div class="wrapper">
-            <HelloWorld msg="You did it!" />
-        </div>
-    </header>
-
-    <main>
-        <TheWelcome />
-    </main>
+    <div>
+        <h1>Sử dụng Lifecycle Hooks</h1>
+        <p v-if="isLoading">Đang tải dữ liệu...</p>
+        <p v-else>{{ data }}</p>
+        <p>{{ input }}</p>
+        <input type="text" v-model="input" />
+    </div>
 </template>
-
-<style scoped>
-header {
-    line-height: 1.5;
-}
-
-.logo {
-    display: block;
-    margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-    header {
-        display: flex;
-        place-items: center;
-        padding-right: calc(var(--section-gap) / 2);
-    }
-
-    .logo {
-        margin: 0 2rem 0 0;
-    }
-
-    header .wrapper {
-        display: flex;
-        place-items: flex-start;
-        flex-wrap: wrap;
-    }
-}
-</style>
