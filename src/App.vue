@@ -1,53 +1,96 @@
 <script setup lang="ts">
-import HelloWorld from "./components/HelloWorld.vue";
-import TheWelcome from "./components/TheWelcome.vue";
+import { ref, reactive } from 'vue';
+
+interface FormState {
+    name: string;
+    email: string;
+    password: string;
+}
+
+const form = reactive<FormState>({
+    name: '',
+    email: '',
+    password: ''
+});
+
+const submittedData = reactive<FormState>({
+    name: '',
+    email: '',
+    password: ''
+});
+
+const isSubmitting = ref<boolean>(false);
+
+const submitForm = (): void => {
+    isSubmitting.value = true;
+
+    setTimeout(() => {
+        submittedData.name = form.name;
+        submittedData.email = form.email;
+        submittedData.password = form.password;
+        isSubmitting.value = false;
+    }, 1000);
+};
 </script>
 
-<template>
-    <header>
-        <img
-            alt="Vue logo"
-            class="logo"
-            src="./assets/logo.svg"
-            width="125"
-            height="125"
-        />
-
-        <div class="wrapper">
-            <HelloWorld msg="You did it!" />
+<template>   
+    <div>
+        <div>
+            <h4>Thông tin đã gửi</h4>
+            <p>Name: <b>{{ submittedData.name }}</b></p>
+            <p>Email: <b>{{ submittedData.email }}</b></p>
+            <p>Password: <b>{{ submittedData.password }}</b></p>
         </div>
-    </header>
-
-    <main>
-        <TheWelcome />
-    </main>
+        <h2>Đăng ký</h2>
+        
+        <label for="name">Tên:</label>
+        <input 
+            id="name"
+            v-model="form.name"
+            type="text"
+            placeholder="Nhập tên"
+        />
+        
+        <label for="email">Email:</label>
+        <input 
+            id="email"
+            v-model="form.email"
+            type="email"
+            placeholder="Nhập email"
+        />
+        
+        <label for="password">Mật khẩu:</label>
+        <input 
+            id="password"
+            v-model="form.password"
+            type="password"
+            placeholder="Nhập mật khẩu"
+        />
+        
+        <!-- Nút gửi form -->
+        <button @click="submitForm" :disabled="isSubmitting">Gửi</button>
+        
+        <!-- Hiển thị trạng thái gửi form -->
+        <p v-if="isSubmitting">Đang gửi...</p>
+    </div>
 </template>
 
 <style scoped>
-header {
-    line-height: 1.5;
+input {
+    margin: 5px 0;
+    padding: 8px;
+    font-size: 16px;
 }
 
-.logo {
-    display: block;
-    margin: 0 auto 2rem;
+button {
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
-@media (min-width: 1024px) {
-    header {
-        display: flex;
-        place-items: center;
-        padding-right: calc(var(--section-gap) / 2);
-    }
-
-    .logo {
-        margin: 0 2rem 0 0;
-    }
-
-    header .wrapper {
-        display: flex;
-        place-items: flex-start;
-        flex-wrap: wrap;
-    }
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 </style>
